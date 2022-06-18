@@ -1,0 +1,23 @@
+{
+  "name": "@livecord/notify",
+  "version": "1.0.2",
+  "description": "Notifier for Youtube and Twitch.",
+  "main": "./src/index.js",
+  "scripts": {
+    "test:twitch": "node ./examples/twitch.test.js",
+    "test:youtube": "node ./examples/youtube.test.js"
+  },
+  "keywords": [
+    "notifier",
+    "youtube",
+    "twitch"
+  ],
+  "author": "Livecord",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "fs": "^0.0.1-security",
+    "rss-parser": "^3.12.0",
+    "ws": "^8.8.0"
+  }
+}
