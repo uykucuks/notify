@@ -1,119 +1,115 @@
-const EventEmitter = require('events');
-const WebSocket = require('ws');
-const axios = require('axios');
-const parser = new (require("rss-parser"))();
-const fs = require('fs');
+import EventEmitter from 'events';
+import RssParser from 'rss-parser';
+import fs from 'fs';
+const parser = new RssParser();
 
-module.exports = class LivecordYoutube extends EventEmitter {
-    constructor({ postedVideos = [], interval = 60000, useDatabase = true }) {
+export class LivecordYoutube extends EventEmitter {
+    public channels: string[] = [];
+    public postedVideos: string[];
+    public useDatabase: boolean;
+
+    constructor({ postedVideos = [], interval = 60000, useDatabase = true }: { postedVideos?: string[], interval: number, useDatabase: boolean }) {
         super();
-
         if (!postedVideos) throw new Error('LivecordYoutube: postedVideos is required');
         if (!Array.isArray(postedVideos)) throw new Error('LivecordYoutube: postedVideos must be an array');
         if (interval && typeof interval !== 'number') throw new Error('LivecordYoutube: interval must be a number');
         if (useDatabase && typeof useDatabase !== 'boolean') throw new Error('LivecordYoutube: useDatabase must be a boolean');
 
-        try {
-            this.ws = new WebSocket(`wss://demo.piesocket.com/v3/channel_1?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV&notify_self`);
-        } catch {
-            const err = new Error('Failed to connect Livecord, please try again later.');
-            err.name = 'Livecord';
-            throw err;
-        };
-        this.channels = [];
         this.postedVideos = postedVideos;
         this.useDatabase = useDatabase;
-        global.this = this;
+
         if (useDatabase) {
             if (fs.existsSync('./livecord-youtube.json')) {
-                let db = JSON.parse(fs.readFileSync('livecord-youtube.json'));
-                db?.videos?.forEach(video => {
+                let db = JSON.parse(fs.readFileSync('livecord-youtube.json').toString());
+
+                (db?.videos || []).forEach((video: string) => {
                     if (!this.postedVideos.includes(video)) this.postedVideos.push(video);
                 });
-                db?.channels?.forEach(channel => {
+                (db?.channels || []).forEach((channel: string) => {
                     if (!this.channels.includes(channel)) this.channels.push(channel);
                 });
             } else {
                 fs.writeFileSync('livecord-youtube.json', JSON.stringify({ videos: [], channels: [] }, null, 2));
-            }
-        }
-        this.ws.on('open', () => {
-            this.emit('ready', Date.now());
-            setInterval(() => {
-                this.channels.forEach(async channel => {
-                    parser.parseURL(`https://www.youtube.com/feeds/videos.xml?channel_id=${channel}`)
-                        .then(data => {
-                            let $ = data.items[0];
-                            if (useDatabase) {
-                                if (postedVideos.includes($.id)) return;
-                                fs.writeFileSync('livecord-youtube.json', JSON.stringify({
-                                    videos: [
-                                        ...JSON.parse(fs.readFileSync('livecord-youtube.json'))?.videos,
-                                        $.id
-                                    ],
-                                    channels: [
-                                        ...JSON.parse(fs.readFileSync('livecord-youtube.json'))?.channels
-                                    ]
-                                }, null, 2));
-                                this.postedVideos.push($.id);
-                                return this.emit('upload', $);
-                            } else {
-                                return this.emit('upload', $);
-                            }
-                        }).catch(() => { });
-                })
-            }, interval || 60000);
-        });
+            };
+        };
 
-        this.ws.on('close', () => {
-            const error = new Error('Connection closed');
-            error.name = 'Livecord';
-            this.emit('close', error);
-        });
+        setTimeout(() => {
+            this.emit('ready', Date.now());
+        }, 50);
+
+        setInterval(() => {
+            this.channels.forEach(async channel => {
+                parser.parseURL(`https://www.youtube.com/feeds/videos.xml?channel_id=${channel}`)
+                    .then(data => {
+                        let $ = data.items[0];
+                        if (useDatabase) {
+                            if (postedVideos.includes($.id)) return;
+                            fs.writeFileSync('livecord-youtube.json', JSON.stringify({
+                                videos: [
+                                    ...JSON.parse(fs.readFileSync('livecord-youtube.json').toString())?.videos,
+                                    $.id
+                                ],
+                                channels: [
+                                    ...JSON.parse(fs.readFileSync('livecord-youtube.json').toString())?.channels
+                                ]
+                            }, null, 2));
+
+                            this.postedVideos.push($.id);
+                            return this.emit('upload', $);
+                        } else {
+                            return this.emit('upload', $);
+                        };
+                    }).catch(() => {});
+            });
+        }, interval || 60000);
     };
-    subscribe(channel) {
+    
+    subscribe(channel: string | string[]) {
         if (!channel) throw new Error('LivecordYoutube: channel is required');
         if (typeof channel === 'string') {
             if (this.channels.includes(channel)) return;
+
             if (this.useDatabase) {
                 fs.writeFileSync('livecord-youtube.json', JSON.stringify({
                     videos: [
-                        ...JSON.parse(fs.readFileSync('livecord-youtube.json'))?.videos,
+                        ...JSON.parse(fs.readFileSync('livecord-youtube.json').toString())?.videos,
                     ],
                     channels: [
-                        ...JSON.parse(fs.readFileSync('livecord-youtube.json'))?.channels,
+                        ...JSON.parse(fs.readFileSync('livecord-youtube.json').toString())?.channels,
                         channel
                     ]
                 }, null, 2));
+
                 this.channels.push(channel);
-                return this.ws.emit('newChannel', channel);
+                return this.emit('newChannel', channel);
             } else {
                 this.channels.push(channel);
-                return this.ws.emit('newChannel', channel);
-            }
+                return this.emit('newChannel', channel);
+            };
         } else if (Array.isArray(channel)) {
             channel.forEach(c => {
                 if (this.channels.includes(c)) return;
                 if (this.useDatabase) {
                     fs.writeFileSync('livecord-youtube.json', JSON.stringify({
                         videos: [
-                            ...JSON.parse(fs.readFileSync('livecord-youtube.json'))?.videos,
+                            ...JSON.parse(fs.readFileSync('livecord-youtube.json').toString())?.videos,
                         ],
                         channels: [
-                            ...JSON.parse(fs.readFileSync('livecord-youtube.json'))?.channels,
+                            ...JSON.parse(fs.readFileSync('livecord-youtube.json').toString())?.channels,
                             c
                         ]
                     }, null, 2));
                     return this.channels.push(c);
                 } else {
                     return this.channels.push(c);
-                }
-            })
+                };
+            });
         } else {
             throw new Error('LivecordYoutube: channel must be a string or array');
-        }
-    }
-    unsubscribe(channel) {
+        };
+    };
+
+    unsubscribe(channel: string | string[]) {
         if (!channel) throw new Error('LivecordYoutube: channel is required');
         if (typeof channel === 'string') {
             if (!this.channels.includes(channel)) return;
@@ -121,15 +117,15 @@ module.exports = class LivecordYoutube extends EventEmitter {
                 this.channels = this.channels.filter(el => el !== channel);
                 return fs.writeFileSync('livecord-youtube.json', JSON.stringify({
                     videos: [
-                        ...JSON.parse(fs.readFileSync('livecord-youtube.json'))?.videos,
+                        ...JSON.parse(fs.readFileSync('livecord-youtube.json').toString())?.videos,
                     ],
                     channels: [
-                        ...JSON.parse(fs.readFileSync('livecord-youtube.json'))?.channels?.filter(el => el !== channel)
+                        ...JSON.parse(fs.readFileSync('livecord-youtube.json').toString())?.channels?.filter((el: string) => el !== channel)
                     ]
                 }, null, 2));
             } else {
                 return this.channels = this.channels.filter(el => el !== channel);
-            }
+            };
         } else if (Array.isArray(channel)) {
             channel.forEach(c => {
                 if (!this.channels.includes(c)) return;
@@ -137,18 +133,18 @@ module.exports = class LivecordYoutube extends EventEmitter {
                     this.channels = this.channels.filter(el => el !== c);
                     return fs.writeFileSync('livecord-youtube.json', JSON.stringify({
                         videos: [
-                            ...JSON.parse(fs.readFileSync('livecord-youtube.json'))?.videos,
+                            ...JSON.parse(fs.readFileSync('livecord-youtube.json').toString())?.videos,
                         ],
                         channels: [
-                            ...JSON.parse(fs.readFileSync('livecord-youtube.json'))?.channels?.filter(el => el !== c)
+                            ...JSON.parse(fs.readFileSync('livecord-youtube.json').toString())?.channels?.filter((el: string) => el !== c)
                         ]
                     }));
                 } else {
                     return this.channels = this.channels.filter(el => el !== c);
-                }
-            })
+                };
+            });
         } else {
             throw new Error('LivecordYoutube: channel must be a string or array');
-        }
-    }
+        };
+    };
 };
