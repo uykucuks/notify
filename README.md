@@ -17,32 +17,35 @@ yarn add @livecord/notify
 ## Twitch
 
 ```js
-const { Twitch } = require('@livecord/notify');
+const { Twitch } = require("@livecord/notify");
 const twitch = new Twitch({ 
     client: {
-        id: 'YOUR_CLIENT_ID', // Your client ID
-        token: 'YOUR_TOKEN_HERE', // https://dev.twitch.tv/docs/authentication/getting-tokens
+        id: "YOUR_CLIENT_ID", // Your client ID
+        token: "YOUR_TOKEN_HERE", // https://dev.twitch.tv/docs/authentication/getting-tokens
     },
-    channels: [ 'clqu_' ], // Array of channels (required)
     interval: 60000 // check channels every (optional) (default: 60000 [60 seconds])
 });
 
-twitch.on('ready', (ready) => {
-    console.log('Twitch connected at: ', ready);
+twitch.on("ready", (ready) => {
+
+    twitch.follow([ "clqu_" ]);
+    twitch.unfollow([ "clqu_" ]);
+
+    console.log("Twitch connected at: ", ready);
 });
 
-twitch.on('live', channel => {
+twitch.on("live", channel => {
     console.log(channel.user_name + " is live!");
 });
 
-twitch.on('offline', channel => {
+twitch.on("offline", channel => {
     console.log(channel.user_name + " is offline!");
 });
 ```
 
 #### How to get Twitch Token?
 ```js
-const { Twitch } = require('@livecord/notify');
+const { Twitch } = require("@livecord/notify");
 
 Twitch.getToken("CLIENT_ID", "CLIENT_SECRET").then(token => {
     console.log(token);
@@ -50,24 +53,59 @@ Twitch.getToken("CLIENT_ID", "CLIENT_SECRET").then(token => {
     console.log(err);
 })
 ```
+#### Data of Channel
+```json
+{
+    "id": "",
+    "user_id": "",
+    "user_login": "",
+    "user_name": "",
+    "game_id": "",
+    "game_name": "",
+    "type": "live",
+    "title": "",
+    "viewer_count": 0,
+    "started_at": "",
+    "language": "",
+    "thumbnail_url": "",
+    "tag_ids": [ "" ],
+    "is_mature": true
+}
+```
 
 ## Youtube
 
 ```js
-const { YouTube } = require('@livecord/notify');
+const { YouTube } = require("@livecord/notify");
 const youtube = new YouTube({
-    channels: [ '' ], // Array of channel ids (required)
-    interval: 1000 // check channels every 1000ms (1 second) (optional) (default: 60000 [60 seconds])]) 
+    interval: 60000, // check channels every 1000ms (1 second) (optional) (default: 60000 [60 seconds])]) 
+    useDatabase: true // use database to store videos (optional) (default: true)
 });
 
-youtube.on('ready', (ready) => {
-    console.log('Youtube connected at: ', ready);
+youtube.on("ready", (ready) => {
+    youtube.subscribe("UC00_j4mtyaMbWX62JWBMmWA"); // Subscribe to a another channel
+    // For multiple: youtube.subscribe(["", ""]);
+
+    youtube.unsubscribe("UC00_j4mtyaMbWX62JWBMmWA"); // Unsubscribe to any added channels
+    // For multiple: youtube.unsubscribe(["", ""]);
+
+    console.log("Youtube connected at: ", ready);
 });
 
-youtube.on('upload', video => {
-    console.log('Youtube new video!', video);
+youtube.on("upload", video => {
+    console.log("Youtube new video!", video);
 })
 ```
-
+#### Data of Video
+```json
+{
+  "title": "",
+  "link": "",
+  "pubDate": "",
+  "author": "",
+  "id": "",
+  "isoDate": ""
+}
+```
 ---
 <h6 align="center">Developed with ❤️ by Livecord</h6>
