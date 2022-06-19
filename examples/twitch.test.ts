@@ -1,12 +1,17 @@
-const { Twitch } = require('../src/index');
+import { Twitch } from '../src';
+
 const twitch = new Twitch({
-    client: {
-      id: "",
-      token: ""
-    },
-    useDatabase: true,
-    interval: 1000
-  });
+	client: {
+		id: "",
+		token: ""
+	},
+	useDatabase: true,
+	interval: 1000
+});
+
+twitch.follow([
+	'elraenn'
+]);
 
 twitch.on('ready', (ready) => {
     console.log('Twitch connected at: ', ready);
