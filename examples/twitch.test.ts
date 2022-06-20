@@ -15,7 +15,12 @@ twitch.follow([
 
 twitch.on('ready', (ready) => {
 	twitch.getUser('elraenn').then(user => {
-		console.log(user);
+		twitch.getFollowers(user.id).then(followers => {
+			console.log(followers.total);
+		})
+		twitch.getFollows(user.id).then(followers => {
+			console.log(followers.total);
+		})
 	})
 	twitch.getLive('elraenn').then(user => {
 		console.log(user);

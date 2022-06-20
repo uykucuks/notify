@@ -49,6 +49,8 @@ twitch.on("offline", channel => {
 // Other Functions
 // twitch.getUser('user_login_name');
 // twitch.getLive('user_login_name');
+// twitch.getFollowers('user_id');
+// twitch.getFollows('user_id');
 ```
 
 #### How to get Twitch Token?

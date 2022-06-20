@@ -218,6 +218,44 @@ export class LivecordTwitch extends EventEmitter {
             throw new Error('LivecordTwitch: userLogin must be a string');
         };
     };
+
+    async getFollowers(userId: string) {
+        if (!userId) throw new Error('LivecordTwitch: userLogin is required');
+
+        if (typeof userId === 'string') {
+            const request = await axios.request({
+                method: "GET",
+                url: `https://api.twitch.tv/helix/users/follows?to_id=${userId}`,
+                headers: { 
+                    "client-id": this.client.id, 
+                    "Authorization": `Bearer ${this.client.token}` 
+                }
+            }).then(res => res.data).catch(err => err.response);
+
+            return { total: request?.total, data: request?.data };
+        } else {
+            throw new Error('LivecordTwitch: userId must be a string');
+        };
+    };
+
+    async getFollows(userId: string) {
+        if (!userId) throw new Error('LivecordTwitch: userId is required');
+
+        if (typeof userId === 'string') {
+            const request = await axios.request({
+                method: "GET",
+                url: `https://api.twitch.tv/helix/users/follows?from_id=${userId}`,
+                headers: { 
+                    "client-id": this.client.id, 
+                    "Authorization": `Bearer ${this.client.token}` 
+                }
+            }).then(res => res.data).catch(err => err.response);
+
+            return { total: request?.total, data: request?.data };
+        } else {
+            throw new Error('LivecordTwitch: userId must be a string');
+        };
+    };
     static async getToken(clientId: string, clientSecret: string) {
         const request = await axios.post('https://id.twitch.tv/oauth2/token', {
             client_id: clientId,
