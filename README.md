@@ -45,6 +45,10 @@ twitch.on("live", channel => {
 twitch.on("offline", channel => {
     console.log(channel.user_name + " is offline!");
 });
+
+// Other Functions
+// twitch.getUser('user_login_name');
+// twitch.getLive('user_login_name');
 ```
 
 #### How to get Twitch Token?

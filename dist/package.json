@@ -1,35 +1,35 @@
 {
-  "name": "@livecord/notify",
-  "version": "1.2.1",
-  "description": "Notifier for YouTube and Twitch.",
-  "main": "./index.js",
-  "types": "./index.d.ts",
-  "scripts": {
-    "test:twitch": "ts-node --transpile-only ./examples/twitch.test.ts",
-    "test:youtube": "ts-node --transpile-only ./examples/youtube.test.ts",
-    "build": "tsc --sourceMap false"
-  },
-  "keywords": [
-    "notifier",
-    "youtube",
-    "twitch",
-    "typescript",
-    "backend"
-  ],
-  "author": "Livecord",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Livecord/notify",
-    "homepage": "https://livecord.me"
-  },
-  "dependencies": {
-    "axios": "^0.27.2",
-    "fs": "^0.0.1-security",
-    "rss-parser": "^3.12.0"
-  },
-  "devDependencies": {
-    "ts-node": "^10.8.1",
-    "typescript": "^4.7.4"
-  }
+    "name": "@livecord/notify",
+    "version": "1.2.2",
+    "description": "Notifier for YouTube and Twitch.",
+    "main": "./index.js",
+    "types": "./index.d.ts",
+    "scripts": {
+        "test:twitch": "ts-node --transpile-only ./examples/twitch.test.ts",
+        "test:youtube": "ts-node --transpile-only ./examples/youtube.test.ts",
+        "build": "tsc --sourceMap false"
+    },
+    "keywords": [
+        "notifier",
+        "youtube",
+        "twitch",
+        "typescript",
+        "backend"
+    ],
+    "author": "Livecord",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Livecord/notify",
+        "homepage": "https://livecord.me"
+    },
+    "dependencies": {
+        "axios": "^0.27.2",
+        "fs": "^0.0.1-security",
+        "rss-parser": "^3.12.0"
+    },
+    "devDependencies": {
+        "ts-node": "^10.8.1",
+        "typescript": "^4.7.4"
+    }
 }

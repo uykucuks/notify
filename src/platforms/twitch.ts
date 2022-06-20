@@ -181,13 +181,13 @@ export class LivecordTwitch extends EventEmitter {
         };
     };
 
-    async getUser(userId: string) {
-        if (!userId) throw new Error('LivecordTwitch: userId is required');
+    async getUser(userLogin: string) {
+        if (!userLogin) throw new Error('LivecordTwitch: userLogin is required');
 
-        if (typeof userId === 'string') {
+        if (typeof userLogin === 'string') {
             const request = await axios.request({
                 method: "GET",
-                url: `https://api.twitch.tv/helix/users?id=${userId}`,
+                url: `https://api.twitch.tv/helix/users?login=${userLogin}`,
                 headers: { 
                     "client-id": this.client.id, 
                     "Authorization": `Bearer ${this.client.token}` 
@@ -196,10 +196,28 @@ export class LivecordTwitch extends EventEmitter {
 
             return request?.data[0];
         } else {
-            throw new Error('LivecordTwitch: userId must be a string');
+            throw new Error('LivecordTwitch: userLogin must be a string');
         };
     };
 
+    async getLive(userLogin: string) {
+        if (!userLogin) throw new Error('LivecordTwitch: userLogin is required');
+
+        if (typeof userLogin === 'string') {
+            const request = await axios.request({
+                method: "GET",
+                url: `https://api.twitch.tv/helix/streams?user_login=${userLogin}`,
+                headers: { 
+                    "client-id": this.client.id, 
+                    "Authorization": `Bearer ${this.client.token}` 
+                }
+            }).then(res => res.data).catch(err => err.response);
+
+            return request?.data[0] ? { isLive: true, ...request?.data[0] } : { isLive: false };
+        } else {
+            throw new Error('LivecordTwitch: userLogin must be a string');
+        };
+    };
     static async getToken(clientId: string, clientSecret: string) {
         const request = await axios.post('https://id.twitch.tv/oauth2/token', {
             client_id: clientId,

@@ -13,6 +13,7 @@ export declare class LivecordTwitch extends EventEmitter {
     });
     follow(channel: string | string[]): number;
     unfollow(channel: string | string[]): void | string[];
-    getUser(userId: string): Promise<any>;
+    getUser(userLogin: string): Promise<any>;
+    getLive(userLogin: string): Promise<any>;
     static getToken(clientId: string, clientSecret: string): Promise<any>;
 }

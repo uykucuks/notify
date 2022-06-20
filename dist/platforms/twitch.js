@@ -205,13 +205,13 @@ class LivecordTwitch extends events_1.default {
         ;
     }
     ;
-    async getUser(userId) {
-        if (!userId)
-            throw new Error('LivecordTwitch: userId is required');
-        if (typeof userId === 'string') {
+    async getUser(userLogin) {
+        if (!userLogin)
+            throw new Error('LivecordTwitch: userLogin is required');
+        if (typeof userLogin === 'string') {
             const request = await axios_1.default.request({
                 method: "GET",
-                url: `https://api.twitch.tv/helix/users?id=${userId}`,
+                url: `https://api.twitch.tv/helix/users?login=${userLogin}`,
                 headers: {
                     "client-id": this.client.id,
                     "Authorization": `Bearer ${this.client.token}`
@@ -220,7 +220,27 @@ class LivecordTwitch extends events_1.default {
             return request?.data[0];
         }
         else {
-            throw new Error('LivecordTwitch: userId must be a string');
+            throw new Error('LivecordTwitch: userLogin must be a string');
+        }
+        ;
+    }
+    ;
+    async getLive(userLogin) {
+        if (!userLogin)
+            throw new Error('LivecordTwitch: userLogin is required');
+        if (typeof userLogin === 'string') {
+            const request = await axios_1.default.request({
+                method: "GET",
+                url: `https://api.twitch.tv/helix/streams?user_login=${userLogin}`,
+                headers: {
+                    "client-id": this.client.id,
+                    "Authorization": `Bearer ${this.client.token}`
+                }
+            }).then(res => res.data).catch(err => err.response);
+            return request?.data[0] ? { isLive: true, ...request?.data[0] } : { isLive: false };
+        }
+        else {
+            throw new Error('LivecordTwitch: userLogin must be a string');
         }
         ;
     }

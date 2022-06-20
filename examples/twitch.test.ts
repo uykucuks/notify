@@ -14,6 +14,12 @@ twitch.follow([
 ]);
 
 twitch.on('ready', (ready) => {
+	twitch.getUser('elraenn').then(user => {
+		console.log(user);
+	})
+	twitch.getLive('elraenn').then(user => {
+		console.log(user);
+	})
     console.log('Twitch connected at: ', ready);
 });
 
