@@ -1,7 +1,7 @@
 # [@livecord/notify](https://npmjs.com/package/@livecord/notify)
 [Do you need my help? Visit our Discord server.](https://livecord.me/discord)
 
-![NPM Downloads](https://img.shields.io/npm/dm/@livecord/notifyt?style=for-the-badge)
+![NPM Downloads](https://img.shields.io/npm/dm/@livecord/notify?style=for-the-badge)
 ![License](https://img.shields.io/npm/l/@livecord/notify?style=for-the-badge)
 ```bash
 Node Version: 16.15.0
